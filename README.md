@@ -225,11 +225,3 @@ Team Robot Waiter:
 * Abby
 * Saleh
 
----
-
-If you want, I can also add:
-
-* Badges
-* A project logo
-* GIF demos
-* Extra launch examples
