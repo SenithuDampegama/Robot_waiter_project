@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>crowd_detector</name>
+  <version>0.0.1</version>
+  <description>YOLOv8n-based person detector that publishes /crowd_alert.</description>
+  <maintainer email="you@example.com">Senithu Dampegama</maintainer>
+  <license>MIT</license>
+
+  <!-- IMPORTANT: build type is ament_python -->
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>cv_bridge</depend>
+
+  <exec_depend>python3-opencv</exec_depend>
+
+  <export>
+    <!-- THIS LINE TELLS COLCON IT'S PYTHON, NOT CMAKE -->
+    <build_type>ament_python</build_type>
+  </export>
+</package>

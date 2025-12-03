@@ -1,0 +1,25 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local ROS 2 build artifacts
+build/
+install/
+log/
+
+# Model weights
+*.pt
+*.onnx
+*.engine
+
+# Editor settings
+.vscode/
+.idea/
