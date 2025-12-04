@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<!--
+File: cam_calibration/package.xml
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Manifest describing dependencies for the cam_calibration tools.
+-->
 <package format="3">
   <name>cam_calibration</name>
   <version>0.0.0</version>

@@ -1,3 +1,10 @@
+"""
+File: cam_calibration/setup.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Package setup script for the cam_calibration ROS 2 ament_python package.
+"""
+
 from setuptools import setup
 
 package_name = 'cam_calibration'
@@ -24,4 +31,3 @@ setup(
         ],
     },
 )
-

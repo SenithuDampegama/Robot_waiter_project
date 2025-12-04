@@ -1,3 +1,11 @@
+"""
+File: cam_calibration/calibrate.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Batch-calibrate a pinhole camera from checkerboard images and
+             export OpenCV YAML intrinsics for the Robot Waiter project.
+"""
+
 from pathlib import Path
 import glob
 
@@ -48,8 +56,8 @@ class CalibrateNode(Node):
         objp[:, :2] = np.mgrid[0:cols, 0:rows].T.reshape(-1, 2)
         objp *= square_size
 
-        objpoints = []   # 3D points
-        imgpoints = []   # 2D points
+        objpoints = []   # 3D points in the checkerboard coordinate frame
+        imgpoints = []   # 2D points in the image plane
 
         gray_shape = None
 
@@ -85,7 +93,7 @@ class CalibrateNode(Node):
             objpoints, imgpoints, gray_shape, None, None
         )
 
-        # RMS reprojection error
+        # RMS reprojection error acts as quick sanity check on calibration quality.
         total_error = 0.0
         total_points = 0
 
@@ -137,4 +145,3 @@ def main(args=None):
     node = CalibrateNode()
     node.destroy_node()
     rclpy.shutdown()
-

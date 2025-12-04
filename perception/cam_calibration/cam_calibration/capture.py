@@ -1,3 +1,11 @@
+"""
+File: cam_calibration/capture.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: ROS 2 node that subscribes to a camera topic and
+             provides an OpenCV GUI for capturing calibration frames.
+"""
+
 import datetime
 from pathlib import Path
 
@@ -31,8 +39,8 @@ class CaptureNode(Node):
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.bridge = CvBridge()
-        self.frame = None
-        self.saved_count = 0
+        self.frame = None          # last received frame from ROS topic
+        self.saved_count = 0       # running tally for GUI feedback
 
         self.subscription = self.create_subscription(
             Image, image_topic, self.image_callback, 10
@@ -41,10 +49,11 @@ class CaptureNode(Node):
         self.get_logger().info(f'Listening to: {image_topic}')
         self.get_logger().info(f'Saving calibration images to: {self.output_dir}')
 
-        # timer just to drive the OpenCV GUI loop
+        # Timer drives the OpenCV GUI loop regardless of message frequency.
         self.timer = self.create_timer(0.05, self.gui_step)
 
     def image_callback(self, msg: Image):
+        """Convert ROS Image messages into cv2 images for later saving."""
         self.frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
     def gui_step(self):
@@ -66,6 +75,7 @@ class CaptureNode(Node):
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord('s'):
+            # Timestamp-based filename guarantees uniqueness and ordering.
             ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')
             filename = self.output_dir / f'img_{ts}.png'
             cv2.imwrite(str(filename), self.frame)
@@ -87,4 +97,3 @@ def main(args=None):
     finally:
         node.destroy_node()
         cv2.destroyAllWindows()
-
