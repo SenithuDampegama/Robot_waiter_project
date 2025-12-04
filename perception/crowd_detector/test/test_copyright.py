@@ -1,3 +1,8 @@
+# File: test/test_copyright.py
+# Author: Senithu Dampegama
+# Student Number: 24035891
+# Description: Runs ament_copyright to ensure every source file carries headers.
+
 # Copyright 2015 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

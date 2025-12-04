@@ -1,3 +1,10 @@
+<!--
+File: README.md
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Project overview and usage instructions for the Crowd Detector ROS 2 package.
+-->
+
 # Crowd Detector (Slow Zone) – Robot Waiter Project
 
 YOLOv8n-based person detection node for the TurtleBot4 "Robot Waiter" platform. It watches the RGB camera stream and signals when the robot should slow down in crowded areas.

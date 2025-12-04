@@ -1,3 +1,8 @@
+# File: test/test_flake8.py
+# Author: Senithu Dampegama
+# Student Number: 24035891
+# Description: Invokes ament_flake8 to ensure style conformance for this package.
+
 # Copyright 2017 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

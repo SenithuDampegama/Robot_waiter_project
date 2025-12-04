@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
+<!--
+File: package.xml
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: ROS 2 package manifest describing dependencies for crowd_detector.
+-->
 <package format="3">
   <name>crowd_detector</name>
   <version>0.0.1</version>

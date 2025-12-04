@@ -1,3 +1,10 @@
+"""
+File: crowd_detector/crowd_detector_node.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: ROS 2 node that runs YOLOv8n person detection and publishes slow-zone alerts.
+"""
+
 import time
 from threading import Lock
 
@@ -48,7 +55,7 @@ class CrowdDetectorNode(Node):
 
         self.bridge = CvBridge()
         self.fps_lock = Lock()
-        self.fps_ema: float | None = None
+        self.fps_ema: float | None = None  # Exponentially smoothed FPS for lightweight diagnostics.
 
         # ---------------------
         # Load YOLOv8n model
@@ -95,6 +102,7 @@ class CrowdDetectorNode(Node):
 
         # Run YOLO inference
         try:
+            # YOLO returns a list of inference results; we only need the first image.
             results = self.model(
                 frame,
                 verbose=False,
