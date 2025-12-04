@@ -1,3 +1,10 @@
+<!--
+File: README.md
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Documentation for the table_localizer ROS 2 package.
+-->
+
 # table_localizer
 
 AprilTag-based table localization package for the Robot Waiter project.
@@ -39,10 +46,14 @@ In three separate terminals:
 # Terminal 1 – static TF from map to camera_link
 ros2 run tf2_ros static_transform_publisher \
     1.0 0.0 0.0  0.0 0.0 0.0  map camera_link
+```
 
+```bash
 # Terminal 2 – table localizer
 ros2 run table_localizer table_localizer_node
+```
 
+```bash
 # Terminal 3 – fake detector
 ros2 run table_localizer fake_apriltag_detector
 ```
@@ -59,5 +70,3 @@ You should see a smoothly changing `PoseStamped` in the `map` frame.
 
 * In the real robot, replace `fake_apriltag_detector` with a real AprilTag detector that publishes `PoseStamped` on `/tag_pose_cam` in the `camera_link` frame.
 * The package is designed to live under the `perception/` directory of the `Robot_waiter_project` repository.
-
-```

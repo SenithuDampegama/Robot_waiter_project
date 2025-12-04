@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
+<!--
+File: table_localizer/package.xml
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Manifest for table_localizer dependencies and metadata.
+-->
 <package format="3">
   <name>table_localizer</name>
   <version>0.0.0</version>

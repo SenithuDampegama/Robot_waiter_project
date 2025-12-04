@@ -1,3 +1,11 @@
+"""
+File: table_localizer/table_localizer_node.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Converts noisy AprilTag detections into a smooth table pose
+             estimate in the map frame for the Robot Waiter project.
+"""
+
 import math
 
 import rclpy
