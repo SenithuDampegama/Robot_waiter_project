@@ -1,4 +1,10 @@
-# table_localizer/fake_apriltag_detector.py
+"""
+File: table_localizer/fake_apriltag_detector.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Publishes a synthetic AprilTag pose in the camera frame so the
+             localizer can be exercised without cameras/hardware.
+"""
 
 import math
 

@@ -1,3 +1,10 @@
+"""
+File: table_localizer/setup.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: ament_python setup script for the table_localizer package.
+"""
+
 from setuptools import setup
 
 package_name = 'table_localizer'
