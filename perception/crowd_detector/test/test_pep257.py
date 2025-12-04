@@ -1,3 +1,8 @@
+# File: test/test_pep257.py
+# Author: Senithu Dampegama
+# Student Number: 24035891
+# Description: Validates that package docstrings comply with PEP 257 guidelines.
+
 # Copyright 2015 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,8 +1,16 @@
+"""
+File: launch/crowd_detector.launch.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Launch description for spinning up the CrowdDetectorNode with tunable params.
+"""
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    """Build the ROS 2 LaunchDescription for the YOLOv8 slow-zone detector."""
     return LaunchDescription([
         Node(
             package='crowd_detector',

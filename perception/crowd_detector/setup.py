@@ -1,3 +1,10 @@
+"""
+File: setup.py
+Author: Senithu Dampegama
+Student Number: 24035891
+Description: Package configuration for installing the crowd_detector ROS 2 module.
+"""
+
 from setuptools import setup
 
 package_name = 'crowd_detector'
