@@ -1,0 +1,12 @@
+build/
+install/
+log/
+.colcon*
+*.pyc
+**pycache**/
+# Calibration raw data
+calib_images/
+cam_calibration_src.tgz
+
+# Large ML models
+*.pt

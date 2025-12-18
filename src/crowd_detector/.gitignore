@@ -1,0 +1,30 @@
+# File: .gitignore
+# Author: Senithu Dampegama
+# Student Number: 24035891
+# Description: Ignore list for Python, ROS 2, and tooling artifacts in this workspace.
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local ROS 2 build artifacts
+build/
+install/
+log/
+
+# Model weights
+*.pt
+*.onnx
+*.engine
+
+# Editor settings
+.vscode/
+.idea/

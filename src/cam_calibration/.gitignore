@@ -1,0 +1,6 @@
+*.pyc
+**pycache**/
+calib_images/
+camera.yaml
+tf_cam_optical.yaml
+*.npz
