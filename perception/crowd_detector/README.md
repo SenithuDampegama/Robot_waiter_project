@@ -1,83 +1,244 @@
-<!--
-File: README.md
-Author: Senithu Dampegama
-Student Number: 24035891
-Description: Project overview and usage instructions for the Crowd Detector ROS 2 package.
--->
-
 # Crowd Detector (Slow Zone) – Robot Waiter Project
 
-YOLOv8n-based person detection node for the TurtleBot4 "Robot Waiter" platform. It watches the RGB camera stream and signals when the robot should slow down in crowded areas.
+YOLOv8n-based person detection node for the TurtleBot4 **Robot Waiter** platform. This document is a **fully reproducible, step‑by‑step guide** covering environment setup, build, debugging pitfalls, webcam testing, and **Gazebo Ignition (TB4) simulation**.
 
-## Features
-- Uses Ultralytics YOLOv8n (PyTorch) for person detection (COCO person class ID 0).
-- Subscribes to a camera topic (default `/oakd/rgb/preview/image_raw`).
+---
+
+## What this node does
+- Subscribes to an RGB camera topic (`sensor_msgs/Image`).
+- Runs **YOLOv8n** and checks for **COCO person class (ID 0)**.
 - Publishes:
-  - `/crowd_alert` (`std_msgs/Bool`) – `True` whenever a person exceeds the confidence threshold.
-  - `/crowd_confidence` (`std_msgs/Float32`) – highest detected person confidence, or `0.0` if none.
-- Tunable parameters: `image_topic`, `conf_threshold`, `device`, `person_class_id`.
-- Designed to run on Jetson Orin Nano and discrete GPU laptops.
+  - **`/crowd_alert`** (`std_msgs/Bool`) → `True` when a person is detected above threshold.
+  - **`/crowd_confidence`** (`std_msgs/Float32`) → highest confidence (or `0.0`).
+- Intended use: **slow‑zone control** in crowded areas (feeds Nav2 / orchestrator logic).
 
-## ROS 2 Interfaces
-- **Node name:** `crowd_detector_node`
-- **Subscriptions:** `sensor_msgs/Image` on `image_topic` (default `/oakd/rgb/preview/image_raw`).
-- **Publications:**
-  - `/crowd_alert` – `std_msgs/Bool`
-  - `/crowd_confidence` – `std_msgs/Float32`
-- **Parameters:**
-  - `image_topic` (string, default `/oakd/rgb/preview/image_raw`)
-  - `crowd_alert_topic` (string, default `/crowd_alert`)
-  - `crowd_conf_topic` (string, default `/crowd_confidence`)
-  - `person_class_id` (int, default `0`)
-  - `conf_threshold` (float, default `0.5`)
-  - `device` (string, `cuda` or `cpu`, default `cuda`)
+---
 
-## Dependencies / Installation
-This is an `ament_python` package.
-
-Python & ROS dependencies:
-- `ultralytics`
-- `opencv-python`
-- `numpy==1.26.4` (ROS Humble + `cv_bridge` requires NumPy 1.x)
-- `cv_bridge` (`ros-humble-cv-bridge`)
-- `rclpy`, `sensor_msgs`, `std_msgs`
-
-Example installs:
-```bash
-sudo apt install ros-humble-cv-bridge ros-humble-image-tools
-pip install ultralytics opencv-python numpy==1.26.4
+## Workspace layout (important)
+This guide assumes:
+```text
+~/robot_waiter_ws/
+├── src/
+│   └── crowd_detector/
+├── build/
+├── install/
+└── log/
 ```
 
-## Build & Run (robot_waiter_ws)
+Always work inside **`robot_waiter_ws`** (not `tb4_ws`).
+
+---
+
+## Prerequisites
+
+### ROS 2
+- **ROS 2 Humble** (Ubuntu 22.04)
+
+```bash
+source /opt/ros/humble/setup.bash
+echo $ROS_DISTRO   # should print: humble
+```
+
+### System dependencies
+```bash
+sudo apt update
+sudo apt install -y \
+  ros-humble-cv-bridge \
+  ros-humble-image-tools \
+  ros-humble-rqt-image-view
+```
+
+### Python dependencies (CRITICAL)
+ROS Humble + `cv_bridge` **requires NumPy 1.x**.
+
+```bash
+python3 -m pip uninstall -y numpy
+python3 -m pip install "numpy<2"
+python3 -m pip install ultralytics opencv-python
+```
+
+Verify:
+```bash
+python3 -c "import numpy; print(numpy.__version__)"   # 1.x
+python3 -c "from cv_bridge import CvBridge; print('cv_bridge OK')"
+```
+
+---
+
+## Build the package
+
 ```bash
 cd ~/robot_waiter_ws
 colcon build --packages-select crowd_detector
 source install/setup.bash
 ```
 
-Launch with the default camera:
+Verify the executable:
 ```bash
-ros2 launch crowd_detector crowd_detector.launch.py
+ros2 pkg executables crowd_detector
+# Expected: crowd_detector  crowd_detector_node
 ```
 
-Override the image topic:
+---
+
+## Launch file (supports overrides)
+The launch file **accepts parameters** (fixed during debugging):
+
 ```bash
-ros2 launch crowd_detector crowd_detector.launch.py image_topic:=/camera/image_raw
+ros2 launch crowd_detector crowd_detector.launch.py \
+  image_topic:=/oakd/rgb/preview/image_raw \
+  device:=cpu
 ```
 
-Monitor the outputs:
+Parameters:
+- `image_topic` (string)
+- `crowd_alert_topic` (string)
+- `crowd_conf_topic` (string)
+- `conf_threshold` (float)
+- `device` (`cpu` or `cuda`)
+
+---
+
+## Sanity test (webcam – fastest)
+
+1. Start a camera publisher:
+```bash
+ros2 run image_tools cam2image --ros-args -r image:=/image
+```
+
+2. Run the detector:
+```bash
+ros2 run crowd_detector crowd_detector_node \
+  --ros-args -p image_topic:=/image -p device:=cpu
+```
+
+3. Observe output:
 ```bash
 ros2 topic echo /crowd_alert
 ros2 topic echo /crowd_confidence
 ```
 
-## Performance Notes
-- Tested at ~80–100 FPS on an RTX 4090 laptop (simulated images).
-- Acceptance criteria: ≥10 FPS on GPU/CPU, detects humans within 1–3 m, continuously publishes `/crowd_alert` when people are visible.
+You should see:
+```text
+data: true
+```
+when a person is visible.
 
-## Integration Hint
-Use `/crowd_alert` to switch the orchestrator/Nav2 stack into a slow-mode profile: when `True`, clamp maximum velocity or select a "slow zone" behavior tree branch; when `False`, revert to normal cruising speed.
+---
 
-## Testing
-- Webcam: `ros2 run image_tools cam2image` and launch this node with `image_topic:=/image`.
-- TurtleBot4 simulation: launch the TB4 Ignition bringup, point the simulated camera at a human model, and set `image_topic` to the simulator's camera topic when launching the detector.
+## Gazebo Ignition (TurtleBot4) test – reproducible
+
+### 1. Launch TB4 Ignition
+```bash
+source /opt/ros/humble/setup.bash
+source ~/robot_waiter_ws/install/setup.bash
+ros2 launch turtlebot4_ignition_bringup turtlebot4_ignition.launch.py
+```
+
+### 2. Find the simulated camera topic
+```bash
+ros2 topic list | grep -Ei "image|camera"
+```
+Typical result:
+```text
+/oakd/rgb/preview/image_raw
+```
+
+Verify frames are flowing:
+```bash
+ros2 topic hz /oakd/rgb/preview/image_raw
+```
+
+(Optional visual check):
+```bash
+ros2 run rqt_image_view rqt_image_view
+```
+
+### 3. Run the crowd detector on the sim camera
+```bash
+ros2 launch crowd_detector crowd_detector.launch.py \
+  image_topic:=/oakd/rgb/preview/image_raw \
+  device:=cpu
+```
+
+### 4. Monitor outputs
+```bash
+ros2 topic echo /crowd_alert
+ros2 topic echo /crowd_confidence
+```
+
+### 5. Trigger detection
+- Insert a **human / actor** model in Gazebo Ignition **in front of the robot camera**.
+- When visible, `/crowd_alert` becomes `True`.
+
+---
+
+## Expected log output (normal)
+```text
+[crowd_detector] person=True, conf=0.89, fps=38.7
+```
+
+Meaning:
+- `person=True` → human detected
+- `conf=0.89` → confidence
+- `fps=38.7` → real‑time inference speed
+
+---
+
+## Common pitfalls (and fixes)
+
+### ❌ `/crowd_alert` shows nothing
+- Cause: no images arriving on `image_topic`.
+- Fix: verify publisher exists:
+```bash
+ros2 topic info <image_topic>
+```
+
+### ❌ NumPy / cv_bridge crash
+Error:
+```text
+AttributeError: _ARRAY_API not found
+```
+Fix:
+```bash
+pip uninstall numpy
+pip install "numpy<2"
+```
+
+### ❌ `image_topic:=...` ignored
+- Cause: hard‑coded params in launch file.
+- Fix: use the updated launch file with `DeclareLaunchArgument`.
+
+---
+
+## Safety system note (TB4)
+Warnings like:
+```text
+Ignoring velocities commanded while an autonomous behavior is running
+Reflex exceeded runtime without clearing hazard
+```
+
+are **normal**. TurtleBot4 safety and autonomy layers correctly override motion. The crowd detector **does not bypass safety**.
+
+---
+
+## Integration with Nav2 / Robot Waiter
+Use `/crowd_alert` as a **behavioral input**:
+- `True` → reduce max velocity / enter slow‑zone BT branch
+- `False` → normal cruising speed
+
+---
+
+## Reproducibility checklist
+- ROS 2 Humble sourced
+- NumPy **1.x** installed
+- `cv_bridge` imports OK
+- Camera topic publishing
+- Launch file rebuilt
+- `/crowd_alert` toggles when a person appears
+
+---
+
+**Author:** Senithu Dampegama  
+**Project:** Robot Waiter – Crowd‑Aware Navigation
+
