@@ -1,0 +1,421 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/SentinluDampegama/Robot_waiter_project/schemas/order_schema.json",
+  "title": "Robot Waiter Order Schema",
+  "description": "Schema for customer orders in the robot waiter system",
+  "type": "object",
+  "required": ["order_id", "table_id", "timestamp", "items", "status"],
+  "definitions": {
+    "menu_item": {
+      "type": "object",
+      "required": ["item_id", "category", "name", "price", "quantity"],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}-[0-9]{4}$",
+          "description": "Unique item identifier (e.g., DR-0001, ML-0100, SD-0200)"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["drink", "meal", "side", "dessert", "special"],
+          "description": "Menu category"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 50,
+          "description": "Display name of the item"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 200,
+          "default": "",
+          "description": "Optional item description"
+        },
+        "price": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMinimum": true,
+          "maximum": 1000,
+          "description": "Price per unit in local currency"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "Quantity ordered"
+        },
+        "special_notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "default": [],
+          "description": "Custom preparation instructions"
+        },
+        "modifiers": {
+          "type": "object",
+          "properties": {
+            "temperature": {
+              "type": "string",
+              "enum": ["hot", "cold", "warm", "extra_hot", "iced"],
+              "default": "hot"
+            },
+            "spice_level": {
+              "type": "string",
+              "enum": ["none", "mild", "medium", "spicy", "extra_spicy"],
+              "default": "medium"
+            },
+            "size": {
+              "type": "string",
+              "enum": ["small", "medium", "large", "xlarge"],
+              "default": "medium"
+            },
+            "allergies": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["dairy", "nuts", "gluten", "seafood", "eggs", "soy"]
+              },
+              "default": [],
+              "description": "Allergy restrictions"
+            },
+            "customizations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "default": {},
+              "description": "Item-specific customizations"
+            }
+          },
+          "additionalProperties": false
+        },
+        "preparation_time": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600,
+          "default": 300,
+          "description": "Estimated preparation time in seconds"
+        }
+      },
+      "additionalProperties": false
+    },
+    
+    "customer_info": {
+      "type": "object",
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "pattern": "^CUST-[0-9]{6}$"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "language": {
+              "type": "string",
+              "enum": ["en", "es", "fr", "de", "zh"],
+              "default": "en"
+            },
+            "accessibility_needs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["visual_aid", "audio_assistance", "high_contrast", "wheelchair"]
+              },
+              "default": []
+            }
+          }
+        }
+      }
+    }
+  },
+  
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "pattern": "^ORD-[A-Z0-9]{8}-[A-Z0-9]{4}$",
+      "description": "Unique order identifier"
+    },
+    
+    "table_id": {
+      "type": "string",
+      "pattern": "^TBL-[0-9]{3}$",
+      "description": "Table identifier where order originates"
+    },
+    
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when order was placed"
+    },
+    
+    "status": {
+      "type": "string",
+      "enum": ["received", "confirmed", "preparing", "ready", "delivering", "delivered", "cancelled", "rejected"],
+      "description": "Current order status"
+    },
+    
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/definitions/menu_item"
+      },
+      "description": "List of ordered items"
+    },
+    
+    "customer": {
+      "$ref": "#/definitions/customer_info",
+      "description": "Optional customer information"
+    },
+    
+    "priority": {
+      "type": "string",
+      "enum": ["low", "normal", "high", "urgent"],
+      "default": "normal",
+      "description": "Order priority level"
+    },
+    
+    "notes": {
+      "type": "string",
+      "maxLength": 500,
+      "default": "",
+      "description": "General order notes"
+    },
+    
+    "total_price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Calculated total price"
+    },
+    
+    "estimated_completion": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Estimated completion time"
+    },
+    
+    "payment_status": {
+      "type": "string",
+      "enum": ["pending", "paid", "partial", "refunded"],
+      "default": "pending",
+      "description": "Payment status"
+    },
+    
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["tablet", "voice", "web", "staff"],
+          "default": "voice"
+        },
+        "robot_id": {
+          "type": "string",
+          "pattern": "^ROBOT-[0-9]{3}$"
+        },
+        "session_id": {
+          "type": "string",
+          "description": "Conversation session identifier"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "default": "1.0.0"
+        }
+      }
+    },
+    
+    "timestamps": {
+      "type": "object",
+      "properties": {
+        "received": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "confirmed": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "preparation_start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ready": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "delivered": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "item_id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  
+  "additionalProperties": false,
+  
+  "examples": [
+    {
+      "description": "Simple drink order",
+      "value": {
+        "order_id": "ORD-ABC12345-DEF6",
+        "table_id": "TBL-101",
+        "timestamp": "2025-11-13T12:30:45Z",
+        "status": "received",
+        "items": [
+          {
+            "item_id": "DR-0001",
+            "category": "drink",
+            "name": "Coca-Cola",
+            "price": 2.50,
+            "quantity": 2,
+            "special_notes": ["no ice", "with lemon"],
+            "modifiers": {
+              "temperature": "cold",
+              "size": "large"
+            }
+          }
+        ],
+        "priority": "normal",
+        "total_price": 5.00,
+        "payment_status": "pending",
+        "metadata": {
+          "source": "voice",
+          "robot_id": "ROBOT-001",
+          "version": "1.0.0"
+        }
+      }
+    },
+    {
+      "description": "Complete meal order with customizations",
+      "value": {
+        "order_id": "ORD-XYZ98765-ABC7",
+        "table_id": "TBL-205",
+        "timestamp": "2025-11-13T13:15:30Z",
+        "status": "confirmed",
+        "items": [
+          {
+            "item_id": "ML-0100",
+            "category": "meal",
+            "name": "Cheeseburger",
+            "description": "Classic beef burger with cheese",
+            "price": 12.99,
+            "quantity": 1,
+            "special_notes": ["no onions", "extra pickles"],
+            "modifiers": {
+              "spice_level": "medium",
+              "allergies": ["dairy"],
+              "customizations": {
+                "cheese_type": "vegan",
+                "bun_type": "brioche"
+              }
+            },
+            "preparation_time": 600
+          },
+          {
+            "item_id": "SD-0200",
+            "category": "side",
+            "name": "French Fries",
+            "price": 4.50,
+            "quantity": 2,
+            "special_notes": ["extra crispy", "with ketchup"],
+            "modifiers": {
+              "spice_level": "none"
+            },
+            "preparation_time": 300
+          },
+          {
+            "item_id": "DR-0003",
+            "category": "drink",
+            "name": "Iced Tea",
+            "price": 3.25,
+            "quantity": 1,
+            "special_notes": ["unsweetened"],
+            "modifiers": {
+              "temperature": "iced",
+              "size": "medium"
+            }
+          }
+        ],
+        "customer": {
+          "customer_id": "CUST-123456",
+          "name": "John Smith",
+          "preferences": {
+            "language": "en",
+            "accessibility_needs": ["visual_aid"]
+          }
+        },
+        "priority": "high",
+        "notes": "Celebrating birthday - please add candle if possible",
+        "total_price": 25.24,
+        "estimated_completion": "2025-11-13T13:30:00Z",
+        "payment_status": "paid",
+        "metadata": {
+          "source": "tablet",
+          "robot_id": "ROBOT-002",
+          "session_id": "SESS-789012",
+          "version": "1.0.0"
+        },
+        "timestamps": {
+          "received": "2025-11-13T13:15:30Z",
+          "confirmed": "2025-11-13T13:16:00Z"
+        }
+      }
+    },
+    {
+      "description": "Order with validation errors",
+      "value": {
+        "order_id": "ORD-INVALID-001",
+        "table_id": "INVALID-TABLE",
+        "timestamp": "invalid-date",
+        "status": "received",
+        "items": [
+          {
+            "item_id": "INVALID",
+            "category": "invalid_category",
+            "name": "",
+            "price": -5,
+            "quantity": 0
+          }
+        ],
+        "errors": [
+          {
+            "code": "VALIDATION_ERROR",
+            "message": "Table ID format invalid",
+            "timestamp": "2025-11-13T12:00:00Z"
+          }
+        ]
+      }
+    }
+  ]
+}
