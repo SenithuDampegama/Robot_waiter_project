@@ -1,0 +1,15 @@
+%YAML:1.0
+---
+camera_name: turtlebot4_oakd
+camera_frame: camera_link
+image_width: 250
+image_height: 250
+distortion_model: plumb_bob
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [166.29352859, 0.00000000, 136.52466659, 0.00000000, 163.50799731, 107.76510190, 0.00000000, 0.00000000, 1.00000000]
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.75778919, -2.67969627, -0.00132734, -0.00455356, 3.04811661]
