@@ -136,15 +136,15 @@ Robot_waiter_project/
 
 ### 🟣 Senithu
 
-Perception, LIDAR, Sensor Fusion, Core FSM, Architecture
+Perception, Core FSM, Architecture,  Speech pipeline, LLM integration, Dialog Manager
 
 ### 🟢 Fazeel
 
-Navigation, Waypoints DB, SLAM, Nav2 tuning
+Navigation, Waypoints DB, SLAM, Nav2 tuning,  LIDAR, Sensor Fusion
 
 ### 🟠 Abby
 
-HRI, Speech pipeline, LLM integration, Dialog Manager, UI
+HRI, UI, order databases 
 
 ### 🔴 Saleh
 
